@@ -27,7 +27,7 @@ export default function PRCelebration({
   useEffect(() => {
     if (isVisible) {
       // Haptic feedback on PR
-      hapticFeedback('success');
+      hapticFeedback('heavy');
       
       // Auto-close after 4 seconds
       const timer = setTimeout(() => {

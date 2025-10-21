@@ -12,7 +12,7 @@ import Card from '../components/common/Card';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ProgressChart from '../components/charts/ProgressChart';
 import { useExerciseStore } from '../stores/exerciseStore';
-import { getBestPRs, getExercisePRs } from '../services/progression/prDetector';
+import { getBestPRs } from '../services/progression/prDetector';
 import { getSetsByExercise } from '../services/database/sets';
 import { getExerciseById } from '../services/database/exercises';
 import type { Exercise, PersonalRecord, WorkoutSet } from '../types/database';
@@ -207,7 +207,7 @@ export default function ProgressScreen() {
             </p>
           ) : (
             <div className="space-y-2">
-              {recentWorkouts.map((set, index) => (
+              {recentWorkouts.map((set) => (
                 <div 
                   key={set.id}
                   className="flex justify-between items-center py-3 px-4 bg-gray-50 rounded-lg"

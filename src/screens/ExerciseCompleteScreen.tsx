@@ -167,7 +167,7 @@ export default function ExerciseCompleteScreen() {
               </Button>
 
               <Button 
-                variant="ghost" 
+                variant="secondary" 
                 fullWidth
                 onClick={handleFinishWorkout}
               >

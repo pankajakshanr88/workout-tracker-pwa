@@ -4,7 +4,7 @@
  * Displays weight progression over time using Chart.js
  */
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,7 +43,7 @@ interface ProgressChartProps {
   currentPR?: number;
 }
 
-export default function ProgressChart({ data, exerciseName, currentPR }: ProgressChartProps) {
+export default function ProgressChart({ data, currentPR }: ProgressChartProps) {
   const chartRef = useRef(null);
 
   if (data.length === 0) {

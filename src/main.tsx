@@ -4,7 +4,7 @@ import App from './App';
 import './index.css';
 
 // Register service worker for PWA (only in production)
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+if ('serviceWorker' in navigator && import.meta.env && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then(registration => {

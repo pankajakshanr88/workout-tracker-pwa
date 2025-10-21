@@ -69,17 +69,19 @@ export default function ExerciseSelectScreen() {
           const alreadyInWorkout = currentWorkoutExercises.some(e => e.id === exercise.id);
 
           return (
-            <Card
+            <div
               key={exercise.id}
-              className={`cursor-pointer transition-all ${
-                isSelected 
-                  ? 'border-2 border-primary bg-primary-light' 
-                  : alreadyInWorkout
-                  ? 'opacity-50 border border-success bg-success-light'
-                  : 'border border-gray-200 hover:border-primary'
-              }`}
               onClick={() => !alreadyInWorkout && handleSelectExercise(exercise.id)}
             >
+              <Card
+                className={`cursor-pointer transition-all ${
+                  isSelected 
+                    ? 'border-2 border-primary bg-primary-light' 
+                    : alreadyInWorkout
+                    ? 'opacity-50 border border-success bg-success-light'
+                    : 'border border-gray-200 hover:border-primary'
+                }`}
+              >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -120,6 +122,7 @@ export default function ExerciseSelectScreen() {
                 </div>
               </div>
             </Card>
+            </div>
           );
         })}
       </div>

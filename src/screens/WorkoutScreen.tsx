@@ -18,8 +18,7 @@ export default function WorkoutScreen() {
     currentExerciseIndex,
     currentSetNumber,
     completeSet,
-    startRest,
-    nextExercise
+    startRest
   } = useWorkoutStore();
 
   const currentExercise = exercises[currentExerciseIndex];

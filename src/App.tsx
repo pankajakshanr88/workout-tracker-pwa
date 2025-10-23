@@ -5,8 +5,11 @@ import WorkoutScreen from './screens/WorkoutScreen';
 import RestScreen from './screens/RestScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import ExerciseCompleteScreen from './screens/ExerciseCompleteScreen';
+import WorkoutTemplatesScreen from './screens/WorkoutTemplatesScreen';
+import ExerciseImportScreen from './screens/ExerciseImportScreen';
 import ExerciseSelectScreen from './screens/ExerciseSelectScreen';
 import AlertsScreen from './screens/AlertsScreen';
+import VolumeScreen from './screens/VolumeScreen';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { initDatabase } from './services/database/init';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
@@ -17,16 +20,16 @@ function App() {
   const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Attach e2e bridge immediately in test mode
-    if (import.meta.env.VITE_E2E === '1') {
-      import('./utils/e2eBridge').then(m => m.attachE2EBridge());
-    }
-
     // Initialize database on app startup
     initDatabase()
       .then(() => {
         console.log('Database initialized successfully');
         setIsDbReady(true);
+
+        // Attach e2e bridge after database is ready
+        if (import.meta.env.VITE_E2E === '1' || import.meta.env.DEV) {
+          import('./utils/e2eBridge').then(m => m.attachE2EBridge());
+        }
       })
       .catch(error => {
         console.error('Failed to initialize database:', error);
@@ -76,6 +79,9 @@ function App() {
         <Route path="/exercise-select" element={<ExerciseSelectScreen />} />
         <Route path="/progress" element={<ProgressScreen />} />
         <Route path="/alerts" element={<AlertsScreen />} />
+        <Route path="/volume" element={<VolumeScreen />} />
+        <Route path="/templates" element={<WorkoutTemplatesScreen />} />
+        <Route path="/admin/import" element={<ExerciseImportScreen />} />
       </Routes>
     </BrowserRouter>
   );

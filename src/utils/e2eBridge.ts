@@ -25,7 +25,9 @@ function safeGetDefaults() {
 type RIR = 'yes_maybe' | 'yes_easily' | 'no_way';
 
 export function attachE2EBridge() {
-  if (import.meta.env.VITE_E2E !== '1') return;
+  // Always attach in development mode for easier testing
+  if (!import.meta.env.DEV) return;
+
   const w = window as any;
   if (w.__e2e) return; // idempotent
 

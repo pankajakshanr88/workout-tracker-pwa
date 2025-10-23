@@ -9,6 +9,9 @@ export interface Exercise {
   parent_exercise_id: number | null;
   description: string | null;
   created_at: string;
+  // Template-specific properties (optional)
+  superset_group?: string | null;
+  order_index?: number;
 }
 
 export interface Workout {
@@ -57,6 +60,23 @@ export interface Setting {
   value: string;
 }
 
+// Workout Templates
+export interface WorkoutTemplate {
+  id: number;
+  name: string; // e.g., "Workout A"
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface WorkoutTemplateExercise {
+  id: number;
+  template_id: number;
+  exercise_id: number;
+  order_index: number;
+  superset_group: string | null; // e.g., 'A' to pair A/B; null when not in superset
+  created_at: string;
+}
+
 export type AlertType = 'stagnation' | 'sandbagging';
 export type AlertSeverity = 'warning' | 'critical';
 
@@ -79,5 +99,32 @@ export interface Program {
   frequency_per_week: number | null;
   is_active: boolean;
   created_at: string;
+}
+
+// Exercise Library Types
+export interface Equipment {
+  id: number;
+  name: string;
+  normalized_name: string;
+}
+
+export interface Muscle {
+  id: number;
+  name: string;
+  group_name: string | null;
+}
+
+export interface ExerciseTag {
+  id: number;
+  name: string;
+}
+
+export interface ExerciseMedia {
+  id: number;
+  exercise_id: number;
+  type: 'video' | 'image';
+  url: string;
+  source: string | null;
+  title: string | null;
 }
 

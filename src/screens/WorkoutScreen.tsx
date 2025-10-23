@@ -123,7 +123,7 @@ export default function WorkoutScreen() {
       {/* Header */}
       <WorkoutHeader
         title={currentExercise.name}
-        subtitle={`Working Set ${currentSetNumber} of ${targetSets}`}
+        subtitle={`Set ${currentSetNumber} of ${targetSets}${currentExercise.superset_group ? ` • Superset ${currentExercise.superset_group}` : ''}`}
       />
 
       <div className="px-4 py-6 space-y-4">

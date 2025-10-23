@@ -4,6 +4,7 @@ import { createWorkout, completeWorkout } from '../services/database/workouts';
 import { createSet } from '../services/database/sets';
 import { processStagnationAlerts } from '../services/alerts/stagnationDetector';
 import { processSandbaggingAlerts } from '../services/alerts/sandbaggingDetector';
+import { getActiveTemplate, getTemplateExercisesWithDetails } from '../services/database/exercises';
 
 interface WorkoutState {
   // Current workout state
@@ -20,7 +21,7 @@ interface WorkoutState {
   lastCompletedSet: WorkoutSet | null;
 
   // Actions
-  startWorkout: (exercises: Exercise[]) => void;
+  startWorkout: (exercises?: Exercise[]) => void;
   completeSet: (weight: number, reps: number, rirResponse: RIRResponse, targetReps: number) => { workoutId: number; setId: number };
   startRest: () => void;
   endRest: () => void;
@@ -41,13 +42,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
   startTime: null,
   lastCompletedSet: null,
 
-  startWorkout: (exercises: Exercise[]) => {
+  startWorkout: (exercises?: Exercise[]) => {
     const today = new Date().toISOString().split('T')[0];
+
+    // Load from active template if no exercises provided
+    let workoutExercises = exercises;
+    if (!workoutExercises) {
+      const activeTemplate = getActiveTemplate();
+      if (activeTemplate) {
+        workoutExercises = getTemplateExercisesWithDetails(activeTemplate.id);
+      }
+    }
+
+    if (!workoutExercises || workoutExercises.length === 0) {
+      console.error('No exercises available for workout');
+      return;
+    }
+
     const workoutId = createWorkout(today, 'StrongLifts 5×5', 'A');
 
     set({
       workoutId,
-      exercises,
+      exercises: workoutExercises,
       currentExerciseIndex: 0,
       currentSetNumber: 1,
       completedSets: [],
@@ -114,7 +130,28 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
 
   nextExercise: () => {
     const { currentExerciseIndex, exercises } = get();
+    const currentExercise = exercises[currentExerciseIndex];
 
+    // Check if there are other exercises in the same superset group
+    if (currentExercise?.superset_group) {
+      const supersetExercises = exercises.filter(e => e.superset_group === currentExercise.superset_group);
+      const currentInGroupIndex = supersetExercises.findIndex(e => e.id === currentExercise.id);
+
+      if (currentInGroupIndex < supersetExercises.length - 1) {
+        // Move to next exercise in the superset group
+        const nextInGroup = supersetExercises[currentInGroupIndex + 1];
+        const nextGlobalIndex = exercises.findIndex(e => e.id === nextInGroup.id);
+
+        set({
+          currentExerciseIndex: nextGlobalIndex,
+          currentSetNumber: 1,
+          isResting: false
+        });
+        return;
+      }
+    }
+
+    // If no more in superset group, or no superset group, move to next exercise
     if (currentExerciseIndex < exercises.length - 1) {
       set({
         currentExerciseIndex: currentExerciseIndex + 1,

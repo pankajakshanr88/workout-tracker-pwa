@@ -45,11 +45,20 @@ export function getWorkoutsByExercise(exerciseId: number, limit: number = 5): Wo
 
 export function completeWorkout(workoutId: number, durationMinutes?: number): void {
   const sql = `
-    UPDATE workouts 
+    UPDATE workouts
     SET completed = 1, duration_minutes = ?
     WHERE id = ?
   `;
   executeQuery(sql, [durationMinutes || null, workoutId]);
   saveDatabase();
+}
+
+export function getWorkoutsInRange(startDate: string, endDate: string): Workout[] {
+  return executeQuery<Workout>(
+    `SELECT * FROM workouts
+     WHERE date >= ? AND date <= ?
+     ORDER BY date DESC, created_at DESC`,
+    [startDate, endDate]
+  );
 }
 

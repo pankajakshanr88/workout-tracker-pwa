@@ -10,6 +10,19 @@ import { suggestNextWeight, getLastWeight } from '../services/progression/weight
 import { getActiveAlerts } from '../services/database/alerts';
 import { analyzeAllExercisesStagnation } from '../services/alerts/stagnationDetector';
 import { analyzeAllExercisesSandbagging } from '../services/alerts/sandbaggingDetector';
+import VolumeChart from '../components/charts/VolumeChart';
+import {
+  getActiveTemplate,
+  getDefaultExercises,
+  getTemplates,
+  saveTemplateExercises,
+  setActiveTemplate,
+  createTemplate,
+  getTemplateExercisesWithDetails
+} from '../services/database/exercises';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import type { WorkoutTemplate } from '../types/database';
 import type { Exercise } from '../types/database';
 
 export default function HomeScreen() {
@@ -20,15 +33,47 @@ export default function HomeScreen() {
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [alertCount, setAlertCount] = useState(0);
+  const [templates, setTemplates] = useState<WorkoutTemplate[]>([]);
 
   useEffect(() => {
     if (!isLoaded) {
       loadExercises();
-    } else if (selectedExercises.length === 0) {
-      // Initialize with all exercises selected
-      setSelectedExercises([...defaultExercises]);
+      return;
     }
-  }, [isLoaded, loadExercises, defaultExercises, selectedExercises.length]);
+
+    // Load templates and active template
+    const all = getTemplates();
+    if (all.length === 0) {
+      // Seed a default template A
+      const id = createTemplate('Workout A');
+      setActiveTemplate(id);
+      setTemplates(getTemplates());
+      setSelectedExercises([...defaultExercises]);
+      saveTemplateExercises(id, defaultExercises.map((e, idx) => ({ exercise_id: e.id, order_index: idx, superset_group: null })));
+      return;
+    }
+
+    setTemplates(all);
+    const active = getActiveTemplate() || all[0];
+    if (active) {
+      // Load exercises from this template
+      const templateExercises = getTemplateExercisesWithDetails(active.id);
+      if (templateExercises.length > 0) {
+        // Template has exercises - use them
+        setSelectedExercises(templateExercises);
+      } else {
+        // Template is empty - seed with defaults
+        const defaults = getDefaultExercises();
+        setSelectedExercises(defaults.map(e => ({ ...e, superset_group: null, order_index: 0 } as Exercise)));
+        saveTemplateExercises(active.id, defaults.map((e, idx) => ({ exercise_id: e.id, order_index: idx, superset_group: null })));
+      }
+    }
+  }, [isLoaded, loadExercises, defaultExercises]);
+
+  // Refresh templates when active template changes
+  useEffect(() => {
+    setTemplates(getTemplates());
+  }, []);
 
   useEffect(() => {
     // Check for alerts when component mounts or exercises change
@@ -43,19 +88,32 @@ export default function HomeScreen() {
     checkAlerts();
   }, [defaultExercises]);
 
-
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    const newOrder = [...selectedExercises];
-    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
-    setSelectedExercises(newOrder);
+  const handleTemplateSwitch = (templateId: number) => {
+    setActiveTemplate(templateId);
+    setTemplates(getTemplates());
+    const templateExercises = getTemplateExercisesWithDetails(templateId);
+    if (templateExercises.length > 0) {
+      setSelectedExercises(templateExercises);
+    } else {
+      // Seed with defaults if empty
+      const defaults = getDefaultExercises();
+      setSelectedExercises(defaults.map(e => ({ ...e, superset_group: null, order_index: 0 } as Exercise)));
+      saveTemplateExercises(templateId, defaults.map((e, idx) => ({ exercise_id: e.id, order_index: idx, superset_group: null })));
+    }
   };
 
-  const handleMoveDown = (index: number) => {
-    if (index === selectedExercises.length - 1) return;
-    const newOrder = [...selectedExercises];
-    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
-    setSelectedExercises(newOrder);
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = selectedExercises.findIndex(e => e.id === Number(active.id));
+    const newIndex = selectedExercises.findIndex(e => e.id === Number(over.id));
+    const reordered = arrayMove(selectedExercises, oldIndex, newIndex);
+    setSelectedExercises(reordered);
+    const activeTemplate = getActiveTemplate();
+    if (activeTemplate) {
+      saveTemplateExercises(activeTemplate.id, reordered.map((e, idx) => ({ exercise_id: e.id, order_index: idx, superset_group: e.superset_group || null })));
+    }
   };
 
   const handleStartWorkout = () => {
@@ -63,7 +121,8 @@ export default function HomeScreen() {
       alert('Please select at least one exercise');
       return;
     }
-    startWorkout(selectedExercises);
+    // Load from active template (new behavior)
+    startWorkout();
     navigate('/workout');
   };
 
@@ -95,6 +154,36 @@ export default function HomeScreen() {
         </div>
       </div>
 
+      {/* Template Selector */}
+      <div className="px-4 py-4 bg-white border-b border-gray-200">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-sm font-medium text-gray-600">Workout Templates:</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/templates')}
+            className="text-xs"
+          >
+            Manage
+          </Button>
+        </div>
+        <div className="flex gap-2 overflow-x-auto">
+          {templates.map(template => (
+            <button
+              key={template.id}
+              onClick={() => handleTemplateSwitch(template.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                template.is_active
+                  ? 'bg-primary text-white shadow-medium'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {template.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="px-4 py-6 space-y-4">
         {/* Workout Card */}
         <Card variant="modern" shadow="medium" hover className="animate-scale-in">
@@ -103,7 +192,7 @@ export default function HomeScreen() {
               <div className="w-10 h-10 bg-gradient-primary rounded-2xl flex items-center justify-center">
                 <span className="text-white font-bold text-lg">A</span>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">WORKOUT A</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{getActiveTemplate()?.name || 'WORKOUT'}</h2>
             </div>
             <Button
               variant="outline"
@@ -162,60 +251,51 @@ export default function HomeScreen() {
                 );
               })
             ) : (
-              /* Display Mode with Reordering */
-              selectedExercises.map((exercise, index) => {
+              /* Display Mode with Drag-and-Drop */
+              <DndContext collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+                <SortableContext items={selectedExercises.map(e => String(e.id))} strategy={verticalListSortingStrategy}>
+                  {selectedExercises.map((exercise) => {
                 const lastWeight = getLastWeight(exercise.id);
                 const suggestedWeight = suggestNextWeight(exercise.id);
 
                 return (
                   <div
                     key={exercise.id}
+                    id={String(exercise.id)}
                     className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-200/50 hover:border-primary/30 hover:shadow-soft transition-all duration-200 animate-fade-in"
                   >
-                    <div className="flex flex-col gap-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                        className={`w-8 h-8 p-0 ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}`}
-                      >
-                        ▲
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === selectedExercises.length - 1}
-                        className={`w-8 h-8 p-0 ${index === selectedExercises.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}`}
-                      >
-                        ▼
-                      </Button>
-                    </div>
+                    <div className="w-8 h-8 rounded-md bg-gray-100 text-gray-500 flex items-center justify-center select-none">≡</div>
                     <div className="flex-1">
                       <div className="font-semibold text-lg text-gray-900">{exercise.name}</div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                          Set {index + 1}
+                        {exercise.superset_group && (
+                          <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full font-medium">
+                            Superset {exercise.superset_group}
+                          </span>
+                        )}
+                        <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                          5×5 StrongLifts
                         </span>
                       </div>
                     </div>
                     <div className="text-right">
                       {lastWeight !== null ? (
                         <div className="space-y-1">
-                          <div className="text-sm text-gray-500">{lastWeight}lbs</div>
+                          <div className="text-sm text-gray-500 line-through">{lastWeight}lbs</div>
                           <div className="flex items-center gap-1">
-                            <span className="text-success font-bold">→</span>
-                            <span className="text-success font-bold text-lg">{suggestedWeight}lbs</span>
+                            <span className="text-success font-bold text-lg">→</span>
+                            <span className="text-success font-bold text-xl">{suggestedWeight}lbs</span>
                           </div>
                         </div>
                       ) : (
-                        <div className="text-primary font-bold text-lg">{suggestedWeight}lbs</div>
+                        <div className="text-primary font-bold text-xl">{suggestedWeight}lbs</div>
                       )}
                     </div>
                   </div>
                 );
-              })
+                  })}
+                </SortableContext>
+              </DndContext>
             )}
           </div>
 
@@ -253,6 +333,37 @@ export default function HomeScreen() {
             </div>
           </Card>
         )}
+
+        {/* Weekly Volume Chart */}
+        <VolumeChart onViewDetails={() => navigate('/volume')} />
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/volume')}
+            icon="📊"
+            className="btn-modern"
+          >
+            Volume Analysis
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/progress')}
+            icon="📈"
+            className="btn-modern"
+          >
+            Progress Charts
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/templates')}
+            icon="🧩"
+            className="btn-modern"
+          >
+            Manage Templates
+          </Button>
+        </div>
 
         {/* Action Buttons */}
         <div className="space-y-4">

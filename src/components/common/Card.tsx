@@ -11,6 +11,7 @@ interface CardProps {
   hover?: boolean;
   animate?: boolean;
   gradient?: boolean;
+  onClick?: () => void;
 }
 
 export default function Card({
@@ -22,7 +23,8 @@ export default function Card({
   rounded = 'xl',
   hover = false,
   animate = false,
-  gradient = false
+  gradient = false,
+  onClick
 }: CardProps) {
   const baseClasses = 'transition-all duration-300';
 
@@ -63,6 +65,7 @@ export default function Card({
   const hoverClasses = hover ? 'hover:shadow-medium hover:-translate-y-1 hover:scale-[1.02]' : '';
   const animateClasses = animate ? 'animate-fade-in' : '';
   const gradientClasses = gradient ? 'bg-gradient-to-br from-white via-gray-50 to-white' : '';
+  const clickableClasses = onClick ? 'cursor-pointer hover:shadow-medium hover:-translate-y-0.5' : '';
 
   return (
     <div
@@ -75,8 +78,10 @@ export default function Card({
         hoverClasses,
         animateClasses,
         gradientClasses,
+        clickableClasses,
         className
       )}
+      onClick={onClick}
     >
       {children}
     </div>

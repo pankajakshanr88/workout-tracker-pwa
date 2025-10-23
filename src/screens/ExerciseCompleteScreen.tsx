@@ -22,8 +22,31 @@ export default function ExerciseCompleteScreen() {
   } = useWorkoutStore();
 
   const completedExercise = exercises[currentExerciseIndex];
-  const nextExerciseData = exercises[currentExerciseIndex + 1];
-  const isLastExercise = currentExerciseIndex >= exercises.length - 1;
+
+  // Find next exercise considering superset groups
+  let nextExerciseData = exercises[currentExerciseIndex + 1];
+  let isLastExercise = currentExerciseIndex >= exercises.length - 1;
+
+  if (completedExercise?.superset_group && !isLastExercise) {
+    // Check if there are more exercises in the same superset group
+    const supersetExercises = exercises.filter(e => e.superset_group === completedExercise.superset_group);
+    const currentInGroupIndex = supersetExercises.findIndex(e => e.id === completedExercise.id);
+
+    if (currentInGroupIndex < supersetExercises.length - 1) {
+      // Next exercise is in the same superset group
+      nextExerciseData = supersetExercises[currentInGroupIndex + 1];
+      isLastExercise = false;
+    } else {
+      // Check if there are exercises after this superset group
+      const exercisesAfterSuperset = exercises.filter(e => (e.order_index || 0) > (completedExercise.order_index || 0));
+      if (exercisesAfterSuperset.length > 0) {
+        nextExerciseData = exercisesAfterSuperset[0];
+        isLastExercise = false;
+      } else {
+        isLastExercise = true;
+      }
+    }
+  }
 
   // Get sets for the completed exercise
   const exerciseSets = completedSets.filter(s => s.exercise_id === completedExercise?.id);
@@ -129,6 +152,9 @@ export default function ExerciseCompleteScreen() {
           <Card className="bg-primary-light border-l-4 border-primary">
             <div className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-2">
               Up Next
+              {nextExerciseData.superset_group && (
+                <span className="ml-2 text-purple-600">• Superset {nextExerciseData.superset_group}</span>
+              )}
             </div>
             <div className="text-xl font-bold text-gray-900 mb-1">
               {nextExerciseData.name}

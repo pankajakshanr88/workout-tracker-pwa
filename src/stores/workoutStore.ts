@@ -24,6 +24,7 @@ interface WorkoutState {
   endRest: () => void;
   nextExercise: () => void;
   endWorkout: () => void;
+  discardWorkout: () => void;
   resetWorkout: () => void;
 }
 
@@ -132,6 +133,21 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       completeWorkout(workoutId, durationMinutes);
     }
 
+    set({
+      workoutId: null,
+      exercises: [],
+      currentExerciseIndex: 0,
+      currentSetNumber: 1,
+      completedSets: [],
+      isActive: false,
+      isResting: false,
+      startTime: null,
+      lastCompletedSet: null
+    });
+  },
+
+  discardWorkout: () => {
+    // Discard workout without saving - just reset state
     set({
       workoutId: null,
       exercises: [],

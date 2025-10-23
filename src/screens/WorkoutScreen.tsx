@@ -5,6 +5,7 @@ import Input from '../components/common/Input';
 import Card from '../components/common/Card';
 import RIRButtons from '../components/workout/RIRButtons';
 import PRCelebration from '../components/workout/PRCelebration';
+import WorkoutHeader from '../components/workout/WorkoutHeader';
 import { useWorkoutStore } from '../stores/workoutStore';
 import { suggestNextWeight } from '../services/progression/weightSuggestion';
 import { getLastWorkoutSets } from '../services/database/sets';
@@ -112,10 +113,10 @@ export default function WorkoutScreen() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-primary text-white px-6 py-6">
-        <h1 className="text-2xl font-semibold">{currentExercise.name}</h1>
-        <p className="text-blue-100 mt-1">Working Set {currentSetNumber} of {targetSets}</p>
-      </div>
+      <WorkoutHeader
+        title={currentExercise.name}
+        subtitle={`Working Set ${currentSetNumber} of ${targetSets}`}
+      />
 
       <div className="px-4 py-6 space-y-4">
         {/* Progress Indicator */}

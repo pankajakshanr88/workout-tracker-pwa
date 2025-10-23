@@ -264,6 +264,7 @@ export default function HomeScreen() {
             disabled={selectedExercises.length === 0}
             icon={selectedExercises.length === 0 ? '🎯' : '🚀'}
             className="btn-modern animate-pulse-glow"
+            data-testid="start-workout"
           >
             {selectedExercises.length === 0
               ? 'SELECT EXERCISES TO START'
@@ -278,6 +279,7 @@ export default function HomeScreen() {
               onClick={() => navigate('/alerts')}
               icon="⚠️"
               className={`btn-modern ${alertCount > 1 ? 'animate-pulse' : ''}`}
+              data-testid="smart-alerts"
             >
               SMART ALERTS • {alertCount} INSIGHT{alertCount > 1 ? 'S' : ''}
             </Button>
@@ -289,6 +291,7 @@ export default function HomeScreen() {
             onClick={() => navigate('/progress')}
             icon="📈"
             className="btn-modern"
+            data-testid="view-progress"
           >
             VIEW PROGRESS & STATS
           </Button>

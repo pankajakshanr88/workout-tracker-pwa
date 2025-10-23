@@ -17,6 +17,11 @@ function App() {
   const [dbError, setDbError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Attach e2e bridge immediately in test mode
+    if (import.meta.env.VITE_E2E === '1') {
+      import('./utils/e2eBridge').then(m => m.attachE2EBridge());
+    }
+
     // Initialize database on app startup
     initDatabase()
       .then(() => {

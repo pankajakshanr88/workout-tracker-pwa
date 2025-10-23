@@ -4,10 +4,13 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "VITE_E2E=1 vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx"
+    "lint": "eslint . --ext ts,tsx",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --project=chromium --headed",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
@@ -30,6 +33,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.19.0",

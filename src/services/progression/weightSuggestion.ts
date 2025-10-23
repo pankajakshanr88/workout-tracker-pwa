@@ -6,12 +6,18 @@ import { getExerciseById } from '../database/exercises';
  * Algorithm from spec lines 1056-1113
  */
 export function suggestNextWeight(exerciseId: number): number {
-  const lastSets = getLastWorkoutSets(exerciseId);
-  
-  if (lastSets.length === 0) {
-    // First time doing exercise - return starting weight
-    return getStartingWeight(exerciseId);
-  }
+  console.log(`Calculating suggested weight for exercise ${exerciseId}`);
+
+  try {
+    const lastSets = getLastWorkoutSets(exerciseId);
+    console.log(`Found ${lastSets.length} last sets for exercise ${exerciseId}`);
+
+    if (lastSets.length === 0) {
+      // First time doing exercise - return starting weight
+      const startingWeight = getStartingWeight(exerciseId);
+      console.log(`No previous sets found, using starting weight: ${startingWeight}lbs`);
+      return startingWeight;
+    }
 
   // Get first set data (Set 1 performance determines progression)
   const firstSet = lastSets[0];
@@ -20,22 +26,38 @@ export function suggestNextWeight(exerciseId: number): number {
   const actualReps = firstSet.reps;
   const rirResponse = firstSet.rir_response;
 
+  console.log(`Last performance: ${lastWeight}lbs × ${actualReps} reps (target: ${targetReps}), RIR: ${rirResponse}`);
+
   // Get appropriate increment based on exercise category
   const increment = getWeightIncrement(exerciseId);
+  console.log(`Weight increment for this exercise: ${increment}lbs`);
+
+  let suggestedWeight: number;
 
   // Progression rules from spec:
   if (actualReps >= targetReps && rirResponse === 'yes_easily') {
     // Hit target easily - double increment
-    return lastWeight + (increment * 2);
+    suggestedWeight = lastWeight + (increment * 2);
+    console.log(`Hit target easily - suggesting ${suggestedWeight}lbs (+${increment * 2})`);
   } else if (actualReps >= targetReps && rirResponse === 'yes_maybe') {
     // Hit target at 1 RIR - standard progression
-    return lastWeight + increment;
+    suggestedWeight = lastWeight + increment;
+    console.log(`Hit target at 1 RIR - suggesting ${suggestedWeight}lbs (+${increment})`);
   } else if (actualReps < targetReps - 2) {
     // Missed target by more than 2 reps - decrease by increment
-    return Math.max(lastWeight - increment, getStartingWeight(exerciseId));
+    suggestedWeight = Math.max(lastWeight - increment, getStartingWeight(exerciseId));
+    console.log(`Missed target by >2 reps - suggesting ${suggestedWeight}lbs (-${increment})`);
   } else {
     // Missed target by 1-2 reps - try same weight again
-    return lastWeight;
+    suggestedWeight = lastWeight;
+    console.log(`Missed target by 1-2 reps - suggesting same weight: ${suggestedWeight}lbs`);
+  }
+
+  return suggestedWeight;
+  } catch (error) {
+    console.error('Error calculating suggested weight:', error);
+    // Fallback to starting weight
+    return getStartingWeight(exerciseId);
   }
 }
 
@@ -45,8 +67,11 @@ export function suggestNextWeight(exerciseId: number): number {
  */
 function getStartingWeight(exerciseId: number): number {
   const exercise = getExerciseById(exerciseId);
-  
-  if (!exercise) return 45; // Default to empty bar
+
+  if (!exercise) {
+    console.warn(`Exercise with ID ${exerciseId} not found, using default weight`);
+    return 45; // Default to empty bar
+  }
 
   const startingWeights: Record<string, number> = {
     'squat': 45,      // Just the bar
@@ -58,7 +83,14 @@ function getStartingWeight(exerciseId: number): number {
     'accessory': 10   // Light dumbbells
   };
 
-  return startingWeights[exercise.category] || 45;
+  const weight = startingWeights[exercise.category];
+  if (weight === undefined) {
+    console.warn(`Unknown exercise category '${exercise.category}' for ${exercise.name}, using default`);
+    return 45;
+  }
+
+  console.log(`Starting weight for ${exercise.name} (${exercise.category}): ${weight}lbs`);
+  return weight;
 }
 
 /**

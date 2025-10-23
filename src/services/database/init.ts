@@ -212,11 +212,11 @@ async function createTables(database: Database): Promise<void> {
 
 async function seedExercises(database: Database): Promise<void> {
   const exercises = [
-    { name: 'Barbell Back Squat', category: 'squat', is_compound: 1, is_default: 1 },
-    { name: 'Barbell Bench Press', category: 'bench', is_compound: 1, is_default: 1 },
-    { name: 'Conventional Deadlift', category: 'deadlift', is_compound: 1, is_default: 1 },
-    { name: 'Barbell Row', category: 'row', is_compound: 1, is_default: 1 },
-    { name: 'Overhead Press', category: 'press', is_compound: 1, is_default: 1 },
+    { name: 'Barbell Back Squat', category: 'squat', is_compound: 1, is_default_variation: 1 },
+    { name: 'Barbell Bench Press', category: 'bench', is_compound: 1, is_default_variation: 1 },
+    { name: 'Conventional Deadlift', category: 'deadlift', is_compound: 1, is_default_variation: 1 },
+    { name: 'Barbell Row', category: 'row', is_compound: 1, is_default_variation: 1 },
+    { name: 'Overhead Press', category: 'press', is_compound: 1, is_default_variation: 1 },
   ];
 
   const stmt = database.prepare(
@@ -225,7 +225,7 @@ async function seedExercises(database: Database): Promise<void> {
   );
 
   for (const ex of exercises) {
-    stmt.run([ex.name, ex.category, ex.is_compound, ex.is_default]);
+    stmt.run([ex.name, ex.category, ex.is_compound, ex.is_default_variation]);
   }
 
   stmt.free();
@@ -249,6 +249,21 @@ export function getDatabase(): Database {
     throw new Error('Database not initialized. Call initDatabase() first.');
   }
   return db;
+}
+
+/**
+ * Reset database - useful for fixing data issues
+ */
+export async function resetDatabase(): Promise<void> {
+  if (idbConnection) {
+    await idbConnection.clear('database');
+  }
+
+  // Reinitialize
+  db = null;
+  idbConnection = null;
+
+  console.log('Database reset complete - refresh page to reinitialize');
 }
 
 export function executeQuery<T>(sql: string, params: any[] = []): T[] {

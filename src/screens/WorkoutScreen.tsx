@@ -36,10 +36,18 @@ export default function WorkoutScreen() {
 
   // Load suggested weight and last workout data
   useEffect(() => {
-    if (currentExercise && currentSetNumber === 1) {
+    if (currentExercise) {
+      console.log(`Loading suggested weight for ${currentExercise.name} (ID: ${currentExercise.id})`);
       const suggested = suggestNextWeight(currentExercise.id);
+      console.log(`Suggested weight calculated: ${suggested}lbs`);
       setSuggestedWeight(suggested);
-      setWeight(suggested.toString());
+
+      // Only auto-set weight for first set of first exercise
+      if (currentSetNumber === 1) {
+        const weightStr = suggested > 0 ? suggested.toString() : '';
+        setWeight(weightStr);
+        console.log(`Auto-setting weight input to: ${weightStr}`);
+      }
     }
   }, [currentExercise, currentSetNumber]);
 
@@ -175,7 +183,7 @@ export default function WorkoutScreen() {
           <div className="text-center">
             <div className="text-white/90 text-sm font-medium mb-2">Recommended Weight</div>
             <div className="text-4xl font-black text-white bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
-              {suggestedWeight || '—'} <span className="text-xl">lbs</span>
+              {suggestedWeight > 0 ? suggestedWeight : '—'} <span className="text-xl">lbs</span>
             </div>
           </div>
         </Card>

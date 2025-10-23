@@ -26,10 +26,6 @@ function App() {
         console.log('Database initialized successfully');
         setIsDbReady(true);
 
-        // Attach e2e bridge after database is ready
-        if (import.meta.env.VITE_E2E === '1' || import.meta.env.DEV) {
-          import('./utils/e2eBridge').then(m => m.attachE2EBridge());
-        }
       })
       .catch(error => {
         console.error('Failed to initialize database:', error);

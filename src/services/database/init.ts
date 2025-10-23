@@ -39,11 +39,13 @@ export async function initDatabase(): Promise<Database> {
       
       // Run migrations for schema updates
       await runMigrations(db);
+      await seedCommonEquipment(db);
     } else {
       console.log('Creating new database');
       db = new SQL.Database();
       await createTables(db);
       await seedExercises(db);
+      await seedCommonEquipment(db);
       await saveDatabase();
     }
 
@@ -1039,6 +1041,31 @@ async function seedExercises(database: Database): Promise<void> {
 
   stmt.free();
   console.log(`${exercises.length} comprehensive exercises seeded`);
+}
+
+async function seedCommonEquipment(database: Database): Promise<void> {
+  try {
+    const existing = database.exec('SELECT COUNT(1) as c FROM equipment');
+    const count = existing && existing[0] && existing[0].values && existing[0].values[0] ? Number(existing[0].values[0][0]) : 0;
+    if (count > 0) return;
+
+    const list = [
+      { name: 'barbell', normalized: 'barbell' },
+      { name: 'dumbbell', normalized: 'dumbbell' },
+      { name: 'EZ curl bar', normalized: 'ez curl bar' },
+      { name: 'machines', normalized: 'machines' },
+      { name: 'bands', normalized: 'bands' },
+    ];
+
+    const stmt = database.prepare('INSERT INTO equipment (name, normalized_name) VALUES (?, ?)');
+    for (const item of list) {
+      stmt.run([item.name, item.normalized]);
+    }
+    stmt.free();
+    console.log('Seeded default equipment list');
+  } catch (e) {
+    console.warn('Failed to seed equipment (may already exist).', e);
+  }
 }
 
 export async function saveDatabase(): Promise<void> {

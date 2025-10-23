@@ -283,7 +283,6 @@ function analyzeWeeklyVolume(muscleGroup: string): VolumeAnalysis {
 
 ### **Testing:**
 - [ ] Add unit tests (Vitest)
-- [ ] Add E2E tests (Playwright)
 - [ ] Add visual regression tests
 
 ### **Code Quality:**

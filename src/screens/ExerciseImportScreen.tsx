@@ -22,7 +22,7 @@ export default function ExerciseImportScreen() {
   const [importedCount, setImportedCount] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const isEnabled = import.meta.env.DEV || import.meta.env.VITE_E2E === '1';
+  const isEnabled = import.meta.env.DEV;
 
   const parse = () => {
     setImportedCount(null);

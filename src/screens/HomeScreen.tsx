@@ -43,16 +43,6 @@ export default function HomeScreen() {
     checkAlerts();
   }, [defaultExercises]);
 
-  const handleToggleExercise = (exercise: Exercise) => {
-    setSelectedExercises(prev => {
-      const isSelected = prev.some(e => e.id === exercise.id);
-      if (isSelected) {
-        return prev.filter(e => e.id !== exercise.id);
-      } else {
-        return [...prev, exercise];
-      }
-    });
-  };
 
   const handleMoveUp = (index: number) => {
     if (index === 0) return;
@@ -88,24 +78,41 @@ export default function HomeScreen() {
   const today = new Date();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 pb-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-6 text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Today</h1>
-        <p className="text-gray-600">{format(today, 'EEEE, MMMM d')}</p>
+      <div className="bg-gradient-primary text-white px-6 py-8 text-center shadow-strong animate-slide-down">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-float">
+            <span className="text-2xl">💪</span>
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Today</h1>
+            <p className="text-blue-100 text-lg font-medium">{format(today, 'EEEE, MMMM d')}</p>
+          </div>
+        </div>
+        <div className="text-blue-100/80 text-sm font-medium">
+          Ready to crush your workout? 🚀
+        </div>
       </div>
 
       <div className="px-4 py-6 space-y-4">
         {/* Workout Card */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">WORKOUT A</h2>
-            <button
+        <Card variant="modern" shadow="medium" hover className="animate-scale-in">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-primary rounded-2xl flex items-center justify-center">
+                <span className="text-white font-bold text-lg">A</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">WORKOUT A</h2>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsCustomizing(!isCustomizing)}
-              className="text-sm text-primary font-semibold hover:text-primary-dark"
+              className="animate-bounce-soft"
             >
               {isCustomizing ? '✓ Done' : '✏️ Customize'}
-            </button>
+            </Button>
           </div>
           
           <div className="space-y-2">
@@ -119,23 +126,35 @@ export default function HomeScreen() {
                 return (
                   <div
                     key={exercise.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      isSelected ? 'border-primary bg-primary-light' : 'border-gray-200'
+                    className={`flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200 animate-slide-up ${
+                      isSelected
+                        ? 'border-primary bg-gradient-primary text-white shadow-medium scale-[1.02]'
+                        : 'border-gray-200 bg-white hover:border-primary/50 hover:shadow-soft hover:scale-[1.01]'
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => handleToggleExercise(exercise)}
-                      className="w-5 h-5 text-primary focus:ring-primary cursor-pointer"
-                    />
+                    <div className={`w-6 h-6 rounded-xl border-2 flex items-center justify-center transition-all ${
+                      isSelected ? 'bg-white border-white' : 'border-gray-300 bg-gray-50'
+                    }`}>
+                      {isSelected && <span className="text-primary text-sm">✓</span>}
+                    </div>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{exercise.name}</div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className={`font-semibold text-lg ${isSelected ? 'text-white' : 'text-gray-900'}`}>
+                        {exercise.name}
+                      </div>
+                      <div className={`text-sm mt-1 font-medium ${
+                        isSelected ? 'text-blue-100' : 'text-gray-600'
+                      }`}>
                         {lastWeight !== null ? (
-                          <>{lastWeight}lbs → <span className="text-success font-semibold">{suggestedWeight}lbs</span></>
+                          <>
+                            {lastWeight}lbs →{' '}
+                            <span className={`font-bold ${isSelected ? 'text-white' : 'text-success'}`}>
+                              {suggestedWeight}lbs
+                            </span>
+                          </>
                         ) : (
-                          <span className="text-primary font-semibold">{suggestedWeight}lbs</span>
+                          <span className={`font-bold ${isSelected ? 'text-white' : 'text-primary'}`}>
+                            {suggestedWeight}lbs
+                          </span>
                         )}
                       </div>
                     </div>
@@ -151,36 +170,47 @@ export default function HomeScreen() {
                 return (
                   <div
                     key={exercise.id}
-                    className="flex items-center gap-3 py-3 border-b border-gray-200 last:border-0"
+                    className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-200/50 hover:border-primary/30 hover:shadow-soft transition-all duration-200 animate-fade-in"
                   >
                     <div className="flex flex-col gap-1">
-                      <button
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleMoveUp(index)}
                         disabled={index === 0}
-                        className={`text-gray-400 hover:text-primary ${index === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                        className={`w-8 h-8 p-0 ${index === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}`}
                       >
                         ▲
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleMoveDown(index)}
                         disabled={index === selectedExercises.length - 1}
-                        className={`text-gray-400 hover:text-primary ${index === selectedExercises.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                        className={`w-8 h-8 p-0 ${index === selectedExercises.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-primary hover:text-white'}`}
                       >
                         ▼
-                      </button>
+                      </Button>
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{exercise.name}</div>
+                      <div className="font-semibold text-lg text-gray-900">{exercise.name}</div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                          Set {index + 1}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm">
+                    <div className="text-right">
                       {lastWeight !== null ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-600">{lastWeight}lbs</span>
-                          <span className="text-success font-bold">→</span>
-                          <span className="text-success font-semibold">{suggestedWeight}lbs</span>
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500">{lastWeight}lbs</div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-success font-bold">→</span>
+                            <span className="text-success font-bold text-lg">{suggestedWeight}lbs</span>
+                          </div>
                         </div>
                       ) : (
-                        <span className="text-primary font-semibold">{suggestedWeight}lbs</span>
+                        <div className="text-primary font-bold text-lg">{suggestedWeight}lbs</div>
                       )}
                     </div>
                   </div>
@@ -198,54 +228,69 @@ export default function HomeScreen() {
 
         {/* Progress Badge */}
         {selectedExercises.length > 0 && (
-          <Card className="bg-success-light border-success text-center">
-            <div className="text-success-dark font-medium">
-              📈 {selectedExercises.length} exercise{selectedExercises.length > 1 ? 's' : ''} selected • Ready to progress!
+          <Card variant="elevated" shadow="medium" className="bg-gradient-success text-center animate-bounce-soft">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-2xl">📈</span>
+              <div className="text-white font-bold text-lg">
+                {selectedExercises.length} exercise{selectedExercises.length > 1 ? 's' : ''} selected • Ready to progress!
+              </div>
             </div>
           </Card>
         )}
 
         {/* Alerts Badge */}
         {alertCount > 0 && (
-          <Card className={`text-center ${alertCount > 1 ? 'bg-warning-light border-warning' : 'bg-info-light border-info'}`}>
-            <div className={`font-medium ${alertCount > 1 ? 'text-warning-dark' : 'text-info-dark'}`}>
-              ⚠️ {alertCount} smart alert{alertCount > 1 ? 's' : ''} • Check recommendations
+          <Card
+            variant="elevated"
+            shadow="medium"
+            className={`text-center animate-pulse-glow ${alertCount > 1 ? 'bg-gradient-warning' : 'bg-gradient-info'}`}
+          >
+            <div className={`flex items-center justify-center gap-2 ${alertCount > 1 ? 'text-white' : 'text-white'}`}>
+              <span className="text-2xl animate-bounce">⚠️</span>
+              <div className="font-bold text-lg">
+                {alertCount} smart alert{alertCount > 1 ? 's' : ''} • Check recommendations
+              </div>
             </div>
           </Card>
         )}
 
         {/* Action Buttons */}
-        <div className="space-y-3">
-          <Button 
-            variant="primary" 
-            fullWidth 
+        <div className="space-y-4">
+          <Button
+            variant="primary"
+            size="xl"
+            fullWidth
             onClick={handleStartWorkout}
             disabled={selectedExercises.length === 0}
-            className="text-lg py-5"
+            icon={selectedExercises.length === 0 ? '🎯' : '🚀'}
+            className="btn-modern animate-pulse-glow"
           >
-            {selectedExercises.length === 0 
+            {selectedExercises.length === 0
               ? 'SELECT EXERCISES TO START'
-              : `START WORKOUT (${selectedExercises.length} ${selectedExercises.length === 1 ? 'EXERCISE' : 'EXERCISES'})`
+              : `START WORKOUT • ${selectedExercises.length} ${selectedExercises.length === 1 ? 'EXERCISE' : 'EXERCISES'}`
             }
           </Button>
-          
+
           {alertCount > 0 && (
             <Button
-              variant="secondary"
+              variant="glass"
               fullWidth
               onClick={() => navigate('/alerts')}
-              className={`${alertCount > 1 ? 'border-warning text-warning-dark bg-warning-light' : 'border-info text-info-dark bg-info-light'}`}
+              icon="⚠️"
+              className={`btn-modern ${alertCount > 1 ? 'animate-pulse' : ''}`}
             >
-              ⚠️ View Alerts ({alertCount})
+              SMART ALERTS • {alertCount} INSIGHT{alertCount > 1 ? 'S' : ''}
             </Button>
           )}
 
           <Button
-            variant="secondary"
+            variant="outline"
             fullWidth
             onClick={() => navigate('/progress')}
+            icon="📈"
+            className="btn-modern"
           >
-            📊 View Progress
+            VIEW PROGRESS & STATS
           </Button>
         </div>
       </div>

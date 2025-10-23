@@ -121,51 +121,69 @@ export default function WorkoutScreen() {
       <div className="px-4 py-6 space-y-4">
         {/* Progress Indicator */}
         {currentSetNumber > 1 && (
-          <Card className="bg-gray-50">
-            <div className="text-sm text-gray-600 mb-2 font-medium">Sets Completed</div>
-            <div className="flex gap-2">
+          <Card variant="modern" shadow="medium" animate className="animate-scale-in">
+            <div className="text-center mb-4">
+              <div className="text-lg font-bold text-gray-900 mb-2">Workout Progress</div>
+              <div className="text-sm text-gray-600 font-medium">Set {currentSetNumber - 1} of {targetSets} Complete</div>
+            </div>
+            <div className="flex gap-3 mb-4">
               {Array.from({ length: targetSets }, (_, i) => (
                 <div
                   key={i}
-                  className={`flex-1 h-2 rounded ${
+                  className={`flex-1 h-3 rounded-full transition-all duration-300 ${
                     i < currentSetNumber - 1
-                      ? 'bg-success'
+                      ? 'bg-gradient-success shadow-success-glow'
                       : i === currentSetNumber - 1
-                      ? 'bg-primary'
-                      : 'bg-gray-300'
+                      ? 'bg-gradient-primary shadow-primary-glow animate-pulse'
+                      : 'bg-gray-200'
                   }`}
                 />
               ))}
             </div>
-            <div className="text-xs text-gray-500 mt-2">
-              {currentSetNumber - 1} of {targetSets} complete
+            <div className="flex justify-center gap-2">
+              <span className="text-xs px-3 py-1 bg-success-light text-success-dark rounded-full font-medium">
+                ✓ {currentSetNumber - 1} Complete
+              </span>
+              <span className="text-xs px-3 py-1 bg-primary-light text-primary-dark rounded-full font-medium">
+                🔄 {targetSets - (currentSetNumber - 1)} Remaining
+              </span>
             </div>
           </Card>
         )}
 
         {/* Last Workout */}
-        <Card className="bg-warning-light border-l-4 border-warning">
-          <div className="text-xs font-semibold text-warning-dark uppercase tracking-wide mb-1">
-            Last Workout
+        <Card variant="elevated" shadow="medium" className="bg-gradient-warning animate-slide-up">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">📊</span>
+            </div>
+            <div className="text-white font-bold text-lg">Last Performance</div>
           </div>
-          <div className="text-gray-900 font-medium">
+          <div className="text-white/90 text-lg font-medium bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
             {lastWorkoutDisplay}
           </div>
         </Card>
 
         {/* Suggested Weight */}
-        <Card className="bg-primary-light border-l-4 border-primary">
-          <div className="text-xs font-semibold text-primary-dark uppercase tracking-wide mb-1">
-            Suggested
+        <Card variant="elevated" shadow="medium" className="bg-gradient-primary animate-slide-up">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <div className="text-white font-bold text-lg">AI Suggestion</div>
           </div>
-          <div className="text-2xl text-primary font-bold">
-            {suggestedWeight || '—'} lbs
+          <div className="text-center">
+            <div className="text-white/90 text-sm font-medium mb-2">Recommended Weight</div>
+            <div className="text-4xl font-black text-white bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+              {suggestedWeight || '—'} <span className="text-xl">lbs</span>
+            </div>
           </div>
         </Card>
 
         {/* Weight Input */}
         <Input
-          type="number"
+          variant="modern"
+          size="lg"
           label="Weight (lbs)"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
@@ -173,18 +191,25 @@ export default function WorkoutScreen() {
           min="0"
           step="5"
           inputMode="decimal"
+          leftIcon="⚖️"
+          helperText="Enter the weight you lifted"
+          className="animate-fade-in"
         />
 
         {/* Reps Input */}
         <Input
-          type="number"
+          variant="modern"
+          size="lg"
           label="Reps Completed"
           value={reps}
           onChange={(e) => setReps(e.target.value)}
-          placeholder="10"
+          placeholder="5"
           min="1"
           step="1"
           inputMode="numeric"
+          leftIcon="🔄"
+          helperText="How many reps did you complete?"
+          className="animate-fade-in"
         />
 
         {/* RIR Buttons */}
@@ -197,12 +222,15 @@ export default function WorkoutScreen() {
         <div className="pt-4">
           <Button
             variant="primary"
+            size="xl"
             fullWidth
             onClick={handleCompleteSet}
             disabled={!isFormValid || isSubmitting}
-            className="text-lg py-5"
+            loading={isSubmitting}
+            icon={isSubmitting ? undefined : '💪'}
+            className="btn-modern animate-pulse-glow"
           >
-            {isSubmitting ? 'SAVING...' : 'COMPLETE SET'}
+            {isSubmitting ? 'ANALYZING & SAVING...' : `COMPLETE SET • READY TO PROGRESS`}
           </Button>
         </div>
 

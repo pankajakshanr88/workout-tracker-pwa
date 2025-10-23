@@ -40,7 +40,7 @@ export default function ConfirmDialog({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-50" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -54,33 +54,46 @@ export default function ConfirmDialog({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title
-                  as="h3"
-                  className="text-lg font-semibold leading-6 text-gray-900 mb-2"
-                >
-                  {title}
-                </Dialog.Title>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600">
-                    {message}
-                  </p>
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden glass rounded-3xl p-8 text-left align-middle shadow-glass transition-all animate-scale-in">
+                <div className="text-center mb-6">
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-3xl flex items-center justify-center ${
+                    confirmVariant === 'error' ? 'bg-error/20' : 'bg-primary/20'
+                  }`}>
+                    <span className={`text-3xl ${confirmVariant === 'error' ? 'animate-bounce' : 'animate-float'}`}>
+                      {confirmVariant === 'error' ? '⚠️' : '❓'}
+                    </span>
+                  </div>
+                  <Dialog.Title
+                    as="h3"
+                    className="text-2xl font-bold leading-6 text-gray-900 mb-2"
+                  >
+                    {title}
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-gray-600 font-medium">
+                      {message}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="mt-6 flex gap-3">
+                <div className="space-y-3">
                   <Button
-                    variant="secondary"
+                    variant="primary"
                     fullWidth
-                    onClick={onClose}
-                  >
-                    {cancelText}
-                  </Button>
-                  <Button
-                    variant={confirmVariant}
-                    fullWidth
+                    size="lg"
                     onClick={handleConfirm}
+                    className={confirmVariant === 'error' ? 'btn-modern animate-pulse' : 'btn-modern'}
                   >
                     {confirmText}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    fullWidth
+                    size="lg"
+                    onClick={onClose}
+                    className="btn-modern"
+                  >
+                    {cancelText}
                   </Button>
                 </div>
               </Dialog.Panel>

@@ -60,7 +60,7 @@ export default function RestScreen() {
   const exerciseSets = completedSets.filter(s => s.exercise_id === currentExercise.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       {/* Header */}
       <WorkoutHeader
         title={currentExercise.name}
@@ -77,34 +77,42 @@ export default function RestScreen() {
         />
 
         {/* Completed Set Performance */}
-        <Card className="bg-success-light border-l-4 border-success">
-          <div className="text-xs font-semibold text-success-dark uppercase tracking-wide mb-2">
-            ✓ Set {currentSetNumber - 1} Complete
+        <Card variant="elevated" shadow="medium" className="bg-gradient-success animate-scale-in">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">✅</span>
+            </div>
+            <div className="text-white font-bold text-lg">Set Complete!</div>
           </div>
-          <div className="text-gray-900 font-semibold text-lg mb-2">
-            {lastCompletedSet.weight}lbs × {lastCompletedSet.reps} reps
+          <div className="text-center mb-3">
+            <div className="text-3xl font-black text-white mb-1">
+              {lastCompletedSet.weight}<span className="text-xl">lbs</span>
+            </div>
+            <div className="text-white/90 text-lg font-medium">
+              × {lastCompletedSet.reps} reps
+            </div>
           </div>
-          <div
-            className={`text-sm font-medium ${
-              rirFeedback.type === 'success'
-                ? 'text-success-dark'
-                : rirFeedback.type === 'warning'
-                ? 'text-warning-dark'
-                : 'text-error-dark'
-            }`}
-          >
+          <div className={`text-center text-white font-bold text-lg bg-white/10 rounded-2xl p-3 backdrop-blur-sm`}>
             {rirFeedback.message}
           </div>
         </Card>
 
         {/* Expected Performance */}
-        <Card className="bg-info-light border-l-4 border-info">
-          <div className="text-xs font-semibold text-info-dark uppercase tracking-wide mb-2">
-            💡 Next Set Prediction
+        <Card variant="elevated" shadow="medium" className="bg-gradient-info animate-scale-in">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <div className="text-white font-bold text-lg">AI Prediction</div>
           </div>
-          <div className="text-gray-900">
-            For Set {currentSetNumber}, expect{' '}
-            <strong className="text-info-dark">{formatRepPrediction(prediction)}</strong> based on your last set
+          <div className="text-center">
+            <div className="text-white/90 text-sm font-medium mb-2">Set {currentSetNumber} Performance</div>
+            <div className="text-2xl font-black text-white bg-white/10 rounded-2xl p-3 backdrop-blur-sm">
+              {formatRepPrediction(prediction)}
+            </div>
+            <div className="text-white/80 text-sm font-medium mt-2">
+              Based on your training pattern
+            </div>
           </div>
         </Card>
 
@@ -117,22 +125,26 @@ export default function RestScreen() {
         />
 
         {/* Action Buttons */}
-        <div className="space-y-3 pt-4">
+        <div className="space-y-4 pt-4">
           <Button
             variant="primary"
+            size="xl"
             fullWidth
             onClick={handleStartNextSet}
-            className="text-lg py-5"
+            icon="🚀"
+            className="btn-modern animate-pulse-glow"
           >
-            START SET {currentSetNumber}
+            START SET {currentSetNumber} • READY TO GO
           </Button>
 
           <Button
-            variant="secondary"
+            variant="outline"
             fullWidth
             onClick={handleSkipRest}
+            icon="⏭️"
+            className="btn-modern"
           >
-            Skip Rest
+            SKIP REST • CONTINUE WORKOUT
           </Button>
         </div>
       </div>

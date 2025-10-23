@@ -1,4 +1,6 @@
 import { clsx } from 'clsx';
+import Card from '../common/Card';
+import Button from '../common/Button';
 import type { RIRResponse } from '../../types/database';
 import { hapticFeedback } from '../../utils/haptics';
 
@@ -20,37 +22,52 @@ export default function RIRButtons({ value, onChange }: RIRButtonsProps) {
   ];
 
   return (
-    <div className="bg-gray-50 rounded-lg p-5">
-      <label className="block font-semibold text-gray-900 mb-3">
-        Could you do 1 more rep?
-      </label>
-      
-      <div className="flex gap-2">
+    <Card variant="modern" shadow="medium" animate className="animate-scale-in">
+      <div className="text-center mb-4">
+        <div className="text-lg font-bold text-gray-900 mb-2">1-Rep In Reserve Check</div>
+        <div className="text-sm text-gray-600 font-medium">Could you do 1 more rep?</div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
         {buttons.map((btn) => (
-          <button
+          <Button
             key={btn.value}
-            type="button"
+            variant={value === btn.value ? 'primary' : 'outline'}
+            size="lg"
+            fullWidth
             onClick={() => handleSelect(btn.value)}
             className={clsx(
-              'flex-1 touch-target px-3 py-3 rounded-lg border-2 transition-all',
-              'flex flex-col items-center justify-center',
+              'text-left justify-start p-4 h-auto animate-fade-in',
               {
-                'border-success bg-success-light text-success-dark font-semibold': 
-                  value === btn.value && btn.value === 'yes_maybe',
-                'border-warning bg-warning-light text-warning-dark font-semibold': 
-                  value === btn.value && btn.value !== 'yes_maybe',
-                'border-gray-300 bg-white text-gray-700': value !== btn.value
+                'animate-bounce-soft': value === btn.value,
               }
             )}
           >
-            <span className="text-sm font-medium">{btn.label}</span>
-            {value === btn.value && (
-              <span className="text-xs mt-1 opacity-90">{btn.sublabel}</span>
-            )}
-          </button>
+            <div className="flex items-center gap-3">
+              <div className={clsx(
+                'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold',
+                {
+                  'bg-white text-primary': value === btn.value,
+                  'bg-gray-100 text-gray-400': value !== btn.value,
+                }
+              )}>
+                {btn.value === 'yes_maybe' ? '✓' : btn.value === 'yes_easily' ? '⚠️' : '❌'}
+              </div>
+              <div className="flex-1">
+                <div className={`font-bold text-base ${value === btn.value ? 'text-white' : 'text-gray-900'}`}>
+                  {btn.label}
+                </div>
+                <div className={`text-sm font-medium ${
+                  value === btn.value ? 'text-blue-100' : 'text-gray-600'
+                }`}>
+                  {btn.sublabel}
+                </div>
+              </div>
+            </div>
+          </Button>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 

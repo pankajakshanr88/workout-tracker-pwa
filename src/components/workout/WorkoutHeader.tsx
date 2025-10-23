@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Transition } from '@headlessui/react';
+import Button from '../common/Button';
 import ConfirmDialog from '../common/ConfirmDialog';
 import { useWorkoutStore } from '../../stores/workoutStore';
 
@@ -25,36 +26,40 @@ export default function WorkoutHeader({ title, subtitle }: WorkoutHeaderProps) {
 
   return (
     <>
-      <div className="bg-primary text-white px-6 py-6">
-        <div className="flex items-start justify-between mb-2">
+      <div className="bg-gradient-primary text-white px-6 py-8 shadow-strong animate-slide-down">
+        <div className="flex items-start justify-between mb-3">
           {/* Home button */}
-          <button
+          <Button
+            variant="glass"
+            size="sm"
             onClick={handleGoHome}
-            className="p-2 -ml-2 hover:bg-primary-dark rounded-lg transition-colors touch-target"
-            aria-label="Go to home"
+            icon={
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
+            }
+            className="animate-float"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-          </button>
+            Home
+          </Button>
 
           {/* Menu button */}
           <Menu as="div" className="relative">
-            <Menu.Button className="p-2 -mr-2 hover:bg-primary-dark rounded-lg transition-colors touch-target">
+            <Menu.Button as={Button} variant="glass" size="sm" className="animate-float">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -66,6 +71,7 @@ export default function WorkoutHeader({ title, subtitle }: WorkoutHeaderProps) {
                   d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
                 />
               </svg>
+              Menu
             </Menu.Button>
 
             <Transition
@@ -111,8 +117,14 @@ export default function WorkoutHeader({ title, subtitle }: WorkoutHeaderProps) {
           </Menu>
         </div>
 
-        <h1 className="text-2xl font-semibold">{title}</h1>
-        <p className="text-blue-100 mt-1">{subtitle}</p>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight mb-2 animate-scale-in">{title}</h1>
+          <p className="text-blue-100 text-xl font-medium animate-fade-in">{subtitle}</p>
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <div className="w-2 h-2 bg-blue-200 rounded-full animate-pulse"></div>
+            <span className="text-blue-100/90 text-sm font-medium">Active Workout Session</span>
+          </div>
+        </div>
       </div>
 
       {/* Discard Confirmation Dialog */}

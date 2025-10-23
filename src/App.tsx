@@ -6,6 +6,7 @@ import RestScreen from './screens/RestScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import ExerciseCompleteScreen from './screens/ExerciseCompleteScreen';
 import ExerciseSelectScreen from './screens/ExerciseSelectScreen';
+import AlertsScreen from './screens/AlertsScreen';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import { initDatabase } from './services/database/init';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
@@ -69,6 +70,7 @@ function App() {
         <Route path="/exercise-complete" element={<ExerciseCompleteScreen />} />
         <Route path="/exercise-select" element={<ExerciseSelectScreen />} />
         <Route path="/progress" element={<ProgressScreen />} />
+        <Route path="/alerts" element={<AlertsScreen />} />
       </Routes>
     </BrowserRouter>
   );

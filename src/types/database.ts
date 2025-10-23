@@ -57,7 +57,7 @@ export interface Setting {
   value: string;
 }
 
-export type AlertType = 'stagnation' | 'sandbagging' | 'form_degradation';
+export type AlertType = 'stagnation' | 'sandbagging';
 export type AlertSeverity = 'warning' | 'critical';
 
 export interface Alert {
@@ -68,6 +68,7 @@ export interface Alert {
   message: string;
   is_dismissed: boolean;
   created_at: string;
+  exercise_name?: string; // Joined from exercises table
 }
 
 export interface Program {

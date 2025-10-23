@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import type { Exercise, WorkoutSet, RIRResponse } from '../types/database';
 import { createWorkout, completeWorkout } from '../services/database/workouts';
 import { createSet } from '../services/database/sets';
+import { processStagnationAlerts } from '../services/alerts/stagnationDetector';
+import { processSandbaggingAlerts } from '../services/alerts/sandbaggingDetector';
 
 interface WorkoutState {
   // Current workout state
@@ -131,6 +133,10 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
     if (workoutId && startTime) {
       const durationMinutes = Math.round((Date.now() - startTime.getTime()) / 60000);
       completeWorkout(workoutId, durationMinutes);
+
+      // Process smart alerts after workout completion
+      processStagnationAlerts();
+      processSandbaggingAlerts();
     }
 
     set({

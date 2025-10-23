@@ -7,6 +7,9 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useExerciseStore } from '../stores/exerciseStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 import { suggestNextWeight, getLastWeight } from '../services/progression/weightSuggestion';
+import { getActiveAlerts } from '../services/database/alerts';
+import { analyzeAllExercisesStagnation } from '../services/alerts/stagnationDetector';
+import { analyzeAllExercisesSandbagging } from '../services/alerts/sandbaggingDetector';
 import type { Exercise } from '../types/database';
 
 export default function HomeScreen() {
@@ -16,6 +19,7 @@ export default function HomeScreen() {
   
   const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [alertCount, setAlertCount] = useState(0);
 
   useEffect(() => {
     if (!isLoaded) {
@@ -25,6 +29,19 @@ export default function HomeScreen() {
       setSelectedExercises([...defaultExercises]);
     }
   }, [isLoaded, loadExercises, defaultExercises, selectedExercises.length]);
+
+  useEffect(() => {
+    // Check for alerts when component mounts or exercises change
+    const checkAlerts = () => {
+      const dbAlerts = getActiveAlerts();
+      const stagnationAlerts = analyzeAllExercisesStagnation();
+      const sandbaggingAlerts = analyzeAllExercisesSandbagging();
+      const totalAlerts = dbAlerts.length + stagnationAlerts.length + sandbaggingAlerts.length;
+      setAlertCount(totalAlerts);
+    };
+
+    checkAlerts();
+  }, [defaultExercises]);
 
   const handleToggleExercise = (exercise: Exercise) => {
     setSelectedExercises(prev => {
@@ -188,6 +205,15 @@ export default function HomeScreen() {
           </Card>
         )}
 
+        {/* Alerts Badge */}
+        {alertCount > 0 && (
+          <Card className={`text-center ${alertCount > 1 ? 'bg-warning-light border-warning' : 'bg-info-light border-info'}`}>
+            <div className={`font-medium ${alertCount > 1 ? 'text-warning-dark' : 'text-info-dark'}`}>
+              ⚠️ {alertCount} smart alert{alertCount > 1 ? 's' : ''} • Check recommendations
+            </div>
+          </Card>
+        )}
+
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button 
@@ -203,8 +229,19 @@ export default function HomeScreen() {
             }
           </Button>
           
-          <Button 
-            variant="secondary" 
+          {alertCount > 0 && (
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => navigate('/alerts')}
+              className={`${alertCount > 1 ? 'border-warning text-warning-dark bg-warning-light' : 'border-info text-info-dark bg-info-light'}`}
+            >
+              ⚠️ View Alerts ({alertCount})
+            </Button>
+          )}
+
+          <Button
+            variant="secondary"
             fullWidth
             onClick={() => navigate('/progress')}
           >

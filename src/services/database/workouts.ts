@@ -32,6 +32,17 @@ export function getRecentWorkouts(limit: number = 10): Workout[] {
   );
 }
 
+export function getWorkoutsByExercise(exerciseId: number, limit: number = 5): Workout[] {
+  return executeQuery<Workout>(
+    `SELECT DISTINCT w.* FROM workouts w
+     JOIN sets s ON w.id = s.workout_id
+     WHERE s.exercise_id = ? AND s.is_warmup = 0
+     ORDER BY w.date DESC
+     LIMIT ?`,
+    [exerciseId, limit]
+  );
+}
+
 export function completeWorkout(workoutId: number, durationMinutes?: number): void {
   const sql = `
     UPDATE workouts 

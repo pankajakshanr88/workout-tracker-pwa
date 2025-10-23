@@ -33,6 +33,12 @@
 - Skip exercises or end workout early
 - Staging screen between exercises
 
+### 🧠 **Smart Alerts System**
+- **Stagnation Detection** - Identifies when you're not progressing
+- **Sandbagging Detection** - Detects when not training to failure
+- **Personalized Interventions** - Suggests specific solutions for each issue
+- **Real-time Analysis** - Automatic alert generation after workouts
+
 ### ⚡ **PWA Capabilities**
 - Works offline (all data stored locally)
 - Installable on any device
@@ -121,16 +127,23 @@ Based on evidence-based fitness principles:
 - Progress charts
 - Workout history
 
+### ✅ Phase 2B: Intelligence Layer (Complete) 🚀
+- **Stagnation Detection** - Identifies plateaus and suggests interventions
+- **Sandbagging Detection** - Detects when not training to failure
+- **Smart Alerts System** - Comprehensive alert management
+- **Real-time Analysis** - Automatic alert generation after workouts
+
 ### ✅ Deployed & Live! 🚀
 - Successfully deployed to Vercel
 - PWA installable on any device
 - All features tested and working
-- Ready for daily use
+- Smart alerts active and functional
 
-### 🚧 Phase 2B: Intelligence Layer (Next)
-- Stagnation detection
-- Sandbagging alerts
+### 🚧 Phase 2C: Advanced Features (Next)
 - Weekly volume tracking
+- Exercise variations
+- Program templates
+- Advanced analytics
 
 ---
 
@@ -142,17 +155,20 @@ workout-tracker-pwa/
 │   ├── components/        # Reusable UI components
 │   │   ├── common/        # Button, Card, Input, etc.
 │   │   ├── charts/        # ProgressChart
-│   │   └── workout/       # RIRButtons, RestTimer, etc.
+│   │   ├── workout/       # RIRButtons, RestTimer, etc.
+│   │   └── alerts/        # StagnationAlert, SandbaggingAlert
 │   ├── screens/           # Page components
 │   │   ├── HomeScreen.tsx
 │   │   ├── WorkoutScreen.tsx
 │   │   ├── RestScreen.tsx
 │   │   ├── ProgressScreen.tsx
 │   │   ├── ExerciseCompleteScreen.tsx
-│   │   └── ExerciseSelectScreen.tsx
+│   │   ├── ExerciseSelectScreen.tsx
+│   │   └── AlertsScreen.tsx
 │   ├── services/          # Business logic
 │   │   ├── database/      # Database operations
-│   │   └── progression/   # Algorithms
+│   │   ├── progression/   # Algorithms
+│   │   └── alerts/        # Smart detection systems
 │   ├── stores/            # Zustand stores
 │   ├── types/             # TypeScript types
 │   ├── hooks/             # Custom React hooks
@@ -192,6 +208,13 @@ workout-tracker-pwa/
 - See weight progression charts
 - Check personal records
 - Review workout history
+
+### Smart Alerts
+
+- Click **"⚠️ View Alerts"** (when alerts are active)
+- Review stagnation and intensity warnings
+- Get personalized training recommendations
+- Dismiss or act on alerts as needed
 
 ---
 
@@ -285,8 +308,8 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 - [x] Phase 1: MVP Core
 - [x] Phase 2A: Progress & PRs
+- [x] **Phase 2B: Intelligence Layer** 🚀
 - [x] **🚀 DEPLOYED & LIVE!**
-- [ ] Phase 2B: Stagnation Detection
 - [ ] Phase 2C: Weekly Volume Tracking
 - [ ] Phase 3: Exercise Variations
 - [ ] Phase 4: React Native Mobile App
